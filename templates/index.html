@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='css/output.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <title>Menu Makanan K-Means</title>
+  </head>
+
+  <body class="bg-gradient-to-br from-neutral-900 to-indigo-900 font-poppins">
+    <div class="flex justify-center h-screen py-20">
+      <div
+        class="bg-white border border-gray-200 rounded-lg shadow-lg flex w-3/4"
+      >
+        <!-- Bagian Kiri (Form) -->
+        <form action="/" method="post" class="p-8 w-3/5 overflow-y-auto">
+          <h1 class="text-xl font-semibold mb-4">Menu Makanan K-Means</h1>
+          <div class="space-y-4">
+            <div>
+              <label
+                for="nama"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Nama</label
+              >
+              <input
+                type="text"
+                name="nama"
+                id="nama"
+                autocomplete="given-name"
+                placeholder="John Doe"
+                required
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              />
+            </div>
+            <div>
+              <label
+                for="umur"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Umur</label
+              >
+              <input
+                type="number"
+                name="umur"
+                id="umur"
+                autocomplete="family-name"
+                placeholder="20"
+                required
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              />
+            </div>
+            <div>
+              <label
+                for="jenis_kelamin"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Jenis Kelamin</label
+              >
+              <select
+                name="jenis_kelamin"
+                id="jenis_kelamin"
+                autocomplete="family-name"
+                required
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              >
+                <option value="l">Laki-laki</option>
+                <option value="p">Perempuan</option>
+              </select>
+            </div>
+            <div>
+              <label
+                for="berat_badan"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Berat Badan</label
+              >
+              <input
+                type="number"
+                name="berat_badan"
+                id="berat_badan"
+                autocomplete="family-name"
+                required
+                placeholder="50"
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              />
+            </div>
+            <div>
+              <label
+                for="tinggi_badan"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Tinggi Badan</label
+              >
+              <input
+                type="number"
+                name="tinggi_badan"
+                id="tinggi_badan"
+                autocomplete="family-name"
+                required
+                placeholder="165"
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              />
+            </div>
+            <div>
+              <label
+                for="kategori_aktivitas"
+                class="block text-sm font-medium leading-6 text-gray-900"
+                >Kategori Aktivitas</label
+              >
+              <select
+                name="kategori_aktivitas"
+                id="kategori_aktivitas"
+                autocomplete="family-name"
+                class="mt-1 block w-full rounded-md border border-black shadow-sm focus:border-[#121481] focus:ring focus:ring-[#121481] focus:ring-opacity-50 p-1"
+              >
+                <option value="sangat_ringan">Sangat Ringan</option>
+                <option value="ringan">Ringan</option>
+                <option value="sedang">Sedang</option>
+                <option value="berat">Berat</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn mt-5 bg-gradient-to-tl from-neutral-900 to-indigo-900 rounded-lg text-center text-white py-2 w-full"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+
+        <!-- Bagian Kanan (Gambar) -->
+        <div class="w-2/5">
+          <img
+            src="{{ url_for('static',filename='images/food-1.png') }}"
+            alt="Food Image"
+            class="object-cover rounded-r-lg w-full h-full"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

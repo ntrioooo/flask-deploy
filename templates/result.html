@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='css/output.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <title>Hasil</title>
+  </head>
+
+  <body class="bg-gradient-to-br from-neutral-900 to-indigo-900 font-poppins">
+    <div class="flex justify-center h-screen py-20">
+      <div
+        class="bg-white border border-gray-200 rounded-lg shadow-lg w-3/4 p-8"
+      >
+        <h3 class="font-semibold text-xl">Halo, {{ nama }}</h3>
+        <h5 class="mt-3">Kebutuhan kalori: {{ kebutuhan_kalori }}</h5>
+        <div class="flex-col w-full mt-5">
+          <h4>Menu Makanan Ke-1</h4>
+          <div class="flex flex-wrap mt-3 gap-3">
+            {% for food in selected_foods_pagi %}
+              <div
+                class="block w-[200px] p-6 border bg-white border-gray-200 rounded-lg shadow text-center"
+              >
+                <h5 class="mb-2 text-lg text-black">{{ food[2] }}</h5>
+                <p class="font-normal text-gray-500">{{ food[0] }}</p>
+              </div>
+            {% endfor %}
+          </div>
+          <h5>Total Kalori Menu Makanan Ke-1: {{ total_calories_pagi }}</h5>
+        </div>
+        <div class="flex-col w-full mt-5">
+          <h4>Menu Makanan Ke-2</h4>
+          <div class="flex flex-wrap mt-3 gap-3">
+            {% for food in selected_foods_siang %}
+              <div
+                class="block w-[200px] p-6 border bg-white border-gray-200 rounded-lg shadow text-center"
+              >
+                <h5 class="mb-2 text-lg text-black">{{ food[2] }}</h5>
+                <p class="font-normal text-gray-500">{{ food[0] }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <h5 class="mt-3">
+          Total Kalori Menu Makanan Ke-2: {{ total_calories_siang }}
+        </h5>
+      </div>
+    </div>
+  </body>
+</html>

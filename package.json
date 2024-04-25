@@ -1,0 +1,17 @@
+{
+  "name": "flask-trio",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "concurrently --kill-others \"npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch\" \"flask --app main.py --debug run\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0",
+    "prettier-plugin-jinja-template": "^1.3.1",
+    "tailwindcss": "^3.3.6"
+  }
+}
