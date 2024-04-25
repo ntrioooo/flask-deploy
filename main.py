@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 def perform_clustering():
     # Load dataset
-    df = pd.read_excel("./data/makanan_updated_97.xls")
+    df = pd.read_csv("./data/makanan_updated_csv.csv")
 
     # print("Data sebelum preprocessing:")
     # print(df.head())
