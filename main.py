@@ -7,34 +7,59 @@ app = Flask(__name__)
 
 def perform_clustering():
     # Load dataset
-    df = pd.read_csv("./data/makanan_updated_csv.csv")
-
-    # print("Data sebelum preprocessing:")
-    # print(df.head())
+    df = pd.read_excel("./data/makanan_updated_97.xls")
 
     # Clustering with K-means
     kmeans = KMeans(n_clusters=2, random_state=2)
     df['cluster'] = kmeans.fit_predict(df[['kalori', 'protein']])
 
-    # print("\nData setelah clustering:")
-    # print(df.head())
-
     return df
 
-# Calculate Harris-Benedict BMR
 def harris_benedict(jenis_kelamin, umur, berat_badan, tinggi_badan, faktor_aktivitas):
     if jenis_kelamin == "l":
-        bmr = 66 + (13.75 * berat_badan) + (5 * tinggi_badan) - (6.8 * umur)
+        bmr = 66 + (13.7 * berat_badan) + (5 * tinggi_badan) - (6.8 * umur)
+        faktor_aktivitas_laki = {
+            "sangat_ringan": 1.3,
+            "ringan": 1.56,
+            "sedang": 1.76,
+            "berat": 2.1
+        }
+        faktor_aktivitas = faktor_aktivitas_laki[faktor_aktivitas]
     elif jenis_kelamin == "p":
         bmr = 655 + (9.6 * berat_badan) + (1.8 * tinggi_badan) - (4.7 * umur)
+        faktor_aktivitas_perempuan = {
+            "sangat_ringan": 1.3,
+            "ringan": 1.55,
+            "sedang": 1.7,
+            "berat": 2.0
+        }
+        faktor_aktivitas = faktor_aktivitas_perempuan[faktor_aktivitas]
     return bmr * faktor_aktivitas
 
-kategori_aktivitas_dict = {
-    "sangat_ringan": 1.30,
-    "ringan": 1.65,
-    "sedang": 1.76,
-    "berat": 2.10
-}   
+def adjust_calories(selected_foods, calorie_requirement):
+    total_calories = sum(food[1] for food in selected_foods)
+    if calorie_requirement > 2000 and calorie_requirement <= 2500:
+        for i in range(len(selected_foods)):
+            food = selected_foods[i]
+            adjusted_calories = food[1] * 1.25
+            selected_foods[i] = (food[0], adjusted_calories, food[2])
+        # Recalculate total calories
+        total_calories = sum(food[1] for food in selected_foods)
+    elif calorie_requirement > 2500 and calorie_requirement <= 3000:
+        for i in range(len(selected_foods)):
+            food = selected_foods[i]
+            adjusted_calories = food[1] * 1.7
+            selected_foods[i] = (food[0], adjusted_calories, food[2])
+        # Recalculate total calories
+        total_calories = sum(food[1] for food in selected_foods)
+    elif calorie_requirement > 3000:
+        for i in range(len(selected_foods)):
+            food = selected_foods[i]
+            adjusted_calories = food[1] * 2.1
+            selected_foods[i] = (food[0], adjusted_calories, food[2])
+        # Recalculate total calories
+        total_calories = sum(food[1] for food in selected_foods)
+    return selected_foods, total_calories
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -45,7 +70,7 @@ def index():
         berat_badan = float(request.form['berat_badan'])
         tinggi_badan = float(request.form['tinggi_badan'])
         nama = request.form['nama']
-        faktor_aktivitas = kategori_aktivitas_dict[request.form['kategori_aktivitas']]
+        faktor_aktivitas = request.form['kategori_aktivitas']
 
         # Calculate BMR
         kebutuhan_kalori = harris_benedict(jenis_kelamin, umur, berat_badan, tinggi_badan, faktor_aktivitas)
@@ -74,12 +99,28 @@ def index():
         total_calories_pagi = sum(food[1] for food in selected_foods_pagi)
         total_calories_siang = sum(food[1] for food in selected_foods_siang)
 
+        # Adjust total calories if they exceed daily calorie requirement
+        selected_foods_pagi, total_calories_pagi = adjust_calories(selected_foods_pagi, kebutuhan_kalori)
+        selected_foods_siang, total_calories_siang = adjust_calories(selected_foods_siang, kebutuhan_kalori)
+
+        if total_calories_pagi + total_calories_siang > kebutuhan_kalori:
+            # Adjust total calories for breakfast and lunch if they exceed daily calorie requirement
+            ratio = kebutuhan_kalori / (total_calories_pagi + total_calories_siang)
+            total_calories_pagi *= ratio
+            total_calories_siang *= ratio
 
         # Render template with results
-        return render_template("result.html", kebutuhan_kalori=kebutuhan_kalori,
-                               selected_foods_pagi=selected_foods_pagi, total_calories_pagi=total_calories_pagi,
-                               selected_foods_siang=selected_foods_siang, total_calories_siang=total_calories_siang, 
-                               nama=nama)
+        if total_calories_pagi + total_calories_siang > kebutuhan_kalori:
+            error_message = "Total kalori makanan pagi dan siang melebihi kebutuhan kalori harian."
+            return render_template("result.html", error_message=error_message, kebutuhan_kalori="{:.2f}".format(kebutuhan_kalori),
+                            selected_foods_pagi=selected_foods_pagi, total_calories_pagi="{:.2f}".format(total_calories_pagi),
+                            selected_foods_siang=selected_foods_siang, total_calories_siang="{:.2f}".format(total_calories_siang), 
+                            nama=nama)
+        else:
+            return render_template("result.html", kebutuhan_kalori="{:.2f}".format(kebutuhan_kalori),
+                            selected_foods_pagi=selected_foods_pagi, total_calories_pagi="{:.2f}".format(total_calories_pagi),
+                            selected_foods_siang=selected_foods_siang, total_calories_siang="{:.2f}".format(total_calories_siang), 
+                            nama=nama)
     else:
         # Render form template
         return render_template("index.html")
