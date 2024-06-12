@@ -1,18 +1,29 @@
 from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import MinMaxScaler
 import os
 
 app = Flask(__name__)
 
 def perform_clustering():
     # Load dataset
-    df = pd.read_excel("./data/makanan_updated_97.xls")
+    df = pd.read_excel("./data/data_makanan_terbaru.xls")
+
+    # Selection data
+    df = df.drop(columns=['id', 'karbohidrat', 'lemak'])
+
+    # Transformation data
+    scaler = MinMaxScaler()
+    df[['kalori', 'protein']] = scaler.fit_transform(df[['kalori', 'protein']])
+
+    
 
     # Clustering with K-means
     kmeans = KMeans(n_clusters=2, random_state=2)
     df['cluster'] = kmeans.fit_predict(df[['kalori', 'protein']])
 
+    print(df)
     return df
 
 def harris_benedict(jenis_kelamin, umur, berat_badan, tinggi_badan, faktor_aktivitas):
@@ -79,21 +90,29 @@ def index():
         df = perform_clustering()
 
         # Find menu for breakfast and lunch
-        menu_pagi = df[df['cluster'] == 0]
-        menu_siang = df[df['cluster'] == 1]
+        menu_pagi = df[df['cluster'] == 1]
+        menu_siang = df[df['cluster'] == 0]
 
         # Select one food from each category for breakfast
         selected_foods_pagi = []
-        categories = ['pokok', 'lauk', 'sayur', 'buah']
+        categories = ['makanan pokok', 'lauk', 'sayuran', 'buah']
         for category in categories:
-            food = menu_pagi[menu_pagi['jenis'] == category].sample(1)
-            selected_foods_pagi.append((food['nama_makanan'].values[0], food['kalori'].values[0], food['jenis'].values[0]))
+            food = menu_pagi[menu_pagi['jenis_makanan'] == category]
+            if not food.empty:
+                food_sample = food.sample(1)
+                selected_foods_pagi.append((food_sample['Nama makanan'].values[0], food_sample['kalori'].values[0], food_sample['jenis_makanan'].values[0]))
+            else:
+                selected_foods_pagi.append((f"Tidak ada makanan {category} di menu pagi", 0, category))
 
         # Select one food from each category for lunch
         selected_foods_siang = []
         for category in categories:
-            food = menu_siang[menu_siang['jenis'] == category].sample(1)
-            selected_foods_siang.append((food['nama_makanan'].values[0], food['kalori'].values[0], food['jenis'].values[0]))
+            food = menu_siang[menu_siang['jenis_makanan'] == category]
+            if not food.empty:
+                food_sample = food.sample(1)
+                selected_foods_siang.append((food_sample['Nama makanan'].values[0], food_sample['kalori'].values[0], food_sample['jenis_makanan'].values[0]))
+            else:
+                selected_foods_siang.append((f"Tidak ada makanan {category} di menu siang", 0, category))
 
         # Calculate total calories for breakfast and lunch
         total_calories_pagi = sum(food[1] for food in selected_foods_pagi)
